@@ -76,11 +76,7 @@ export const makeSocket = (config: SocketConfig) => {
 		url = new URL(`tcp://${MOBILE_ENDPOINT}:${MOBILE_PORT}`)
 	}
 
-	if(!config.mobile && url.protocol === 'wss' && authState?.creds?.routingInfo) {
-		url.searchParams.append('ED', authState.creds.routingInfo.toString('base64url'))
-	}
-
-	const ws = config.socket ? config.socket : config.mobile ? new MobileSocketClient(url, config) : new WebSocketClient(url, config)
+	const ws = config.mobile ? new MobileSocketClient(url, config) : new WebSocketClient(url, config)
 
 	ws.connect()
 
@@ -92,8 +88,7 @@ export const makeSocket = (config: SocketConfig) => {
 		keyPair: ephemeralKeyPair,
 		NOISE_HEADER: config.mobile ? MOBILE_NOISE_HEADER : NOISE_WA_HEADER,
 		mobile: config.mobile,
-		logger,
-		routingInfo: authState?.creds?.routingInfo
+		logger
 	})
 
 	const { creds } = authState
@@ -134,7 +129,7 @@ export const makeSocket = (config: SocketConfig) => {
 	/** send a binary node */
 	const sendNode = (frame: BinaryNode) => {
 		if(logger.level === 'trace') {
-			logger.trace({ xml: binaryNodeToString(frame), msg: 'xml send' })
+			logger.trace(binaryNodeToString(frame), 'xml send')
 		}
 
 		const buff = encodeBinaryNode(frame)
@@ -311,7 +306,7 @@ export const makeSocket = (config: SocketConfig) => {
 		}
 	}
 
-	const onMessageReceived = (data: Buffer) => {
+	const onMessageRecieved = (data: Buffer) => {
 		noise.decodeFrame(data, frame => {
 			// reset ping timeout
 			lastDateRecv = new Date()
@@ -324,7 +319,7 @@ export const makeSocket = (config: SocketConfig) => {
 				const msgId = frame.attrs.id
 
 				if(logger.level === 'trace') {
-					logger.trace({ xml: binaryNodeToString(frame), msg: 'recv xml' })
+					logger.trace(binaryNodeToString(frame), 'recv xml')
 				}
 
 				/* Check if this is a response to a message we sent */
@@ -530,7 +525,7 @@ export const makeSocket = (config: SocketConfig) => {
 						{
 							tag: 'companion_platform_display',
 							attrs: {},
-							content: `${browser[1]} (${browser[0]})`
+							content: config.browser[0]
 						},
 						{
 							tag: 'link_code_pairing_nonce',
@@ -552,26 +547,7 @@ export const makeSocket = (config: SocketConfig) => {
 		return Buffer.concat([salt, randomIv, ciphered])
 	}
 
-	const sendWAMBuffer = (wamBuffer: Buffer) => {
-		return query({
-			tag: 'iq',
-			attrs: {
-				to: S_WHATSAPP_NET,
-				id: generateMessageTag(),
-				xmlns: 'w:stats'
-			},
-			content: [
-				{
-					tag: 'add',
-					attrs: {},
-					content: wamBuffer
-				}
-			]
-		})
-	}
-
-	ws.on('message', onMessageReceived)
-
+	ws.on('message', onMessageRecieved)
 	ws.on('open', async() => {
 		try {
 			await validateConnection()
@@ -647,14 +623,12 @@ export const makeSocket = (config: SocketConfig) => {
 		}
 	})
 	// login complete
-	ws.on('CB:success', async(node: BinaryNode) => {
+	ws.on('CB:success', async() => {
 		await uploadPreKeysToServerIfRequired()
 		await sendPassiveIq('active')
 
 		logger.info('opened connection to WA')
 		clearTimeout(qrTimer) // will never happen in all likelyhood -- but just in case WA sends success on first try
-
-		ev.emit('creds.update', { me: { ...authState.creds.me!, lid: node.attrs.lid } })
 
 		ev.emit('connection.update', { connection: 'open' })
 	})
@@ -674,15 +648,6 @@ export const makeSocket = (config: SocketConfig) => {
 
 	ws.on('CB:ib,,downgrade_webclient', () => {
 		end(new Boom('Multi-device beta not joined', { statusCode: DisconnectReason.multideviceMismatch }))
-	})
-
-	ws.on('CB:ib,,edge_routing', (node: BinaryNode) => {
-		const edgeRoutingNode = getBinaryNodeChild(node, 'edge_routing')
-		const routingInfo = getBinaryNodeChild(edgeRoutingNode, 'routing_info')
-		if(routingInfo?.content) {
-			authState.creds.routingInfo = Buffer.from(routingInfo?.content as Uint8Array)
-			ev.emit('creds.update', authState.creds)
-		}
 	})
 
 	let didStartBuffer = false
@@ -756,7 +721,6 @@ export const makeSocket = (config: SocketConfig) => {
 		requestPairingCode,
 		/** Waits for the connection to WA to reach a state */
 		waitForConnectionUpdate: bindWaitForConnectionUpdate(ev),
-		sendWAMBuffer,
 	}
 }
 

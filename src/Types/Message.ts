@@ -96,14 +96,6 @@ export type PollMessageOptions = {
     messageSecret?: Uint8Array
 }
 
-type SharePhoneNumber = {
-    sharePhoneNumber: boolean
-}
-
-type RequestPhoneNumber = {
-    requestPhoneNumber: boolean
-}
-
 export type MediaType = keyof typeof MEDIA_HKDF_KEY_MAPPING
 export type AnyMediaMessageContent = (
     ({
@@ -116,8 +108,6 @@ export type AnyMediaMessageContent = (
         caption?: string
         gifPlayback?: boolean
         jpegThumbnail?: string
-        /** if set to true, will send as a `video note` */
-        ptv?: boolean
     } & Mentionable & Contextable & Buttonable & Templatable & WithDimensions)
     | {
         audio: WAMediaUpload
@@ -179,7 +169,7 @@ export type AnyRegularMessageContent = (
         businessOwnerJid?: string
         body?: string
         footer?: string
-    } | SharePhoneNumber | RequestPhoneNumber
+    }
 ) & ViewOnce
 
 export type AnyMessageContent = AnyRegularMessageContent | {
@@ -227,8 +217,6 @@ export type MiscMessageGenerationOptions = MinimalRelayOptions & {
     backgroundColor?: string
     /** font type for status */
     font?: number
-    /** if it is broadcast */
-    broadcast?: boolean
 }
 export type MessageGenerationOptionsFromContent = MiscMessageGenerationOptions & {
 	userJid: string
