@@ -10,12 +10,12 @@ steps:
   run: unzip Baileys-6.7.5.zip -d entahlah
 - name: Configure Git
   run: |
-git config --local user.email "danurput@gmail.com"
-git config --local user.name "MrSnZ"
+    git config --local user.email "danurput@gmail.com"
+    git config --local user.name "MrSnZ"
 - name: Add dan Commit perubahan
   run: |
-git add .
-git commit -m "Hasil unzip file"
+    git add .
+    git commit -m "Hasil unzip file"
 - name: Push perubahan
   uses: ad-m/github-push-action@v0.6.0
 with:
