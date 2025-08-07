@@ -5,7 +5,7 @@ unzip-dan-push:
 runs-on: ubuntu-latest
 steps:
 - name: Checkout code
-uses: actions/checkout@v3
+uses: actions/checkout@v4
 - name: Unzip file
 run: unzip Baileys-6.7.5.zip -d entahlah
 - name: Configure Git
