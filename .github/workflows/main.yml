@@ -1,9 +1,9 @@
 name: Unzip dan Push
 on: workflow_dispatch
 jobs:
-unzip-dan-push:
-runs-on: ubuntu-latest
-steps:
+  unzip-dan-push:
+   runs-on: ubuntu-latest
+    steps:
 - name: Checkout code
   uses: actions/checkout@v4
 - name: Unzip file
