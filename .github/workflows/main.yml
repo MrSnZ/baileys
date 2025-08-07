@@ -5,18 +5,18 @@ unzip-dan-push:
 runs-on: ubuntu-latest
 steps:
 - name: Checkout code
-uses: actions/checkout@v4
+  uses: actions/checkout@v4
 - name: Unzip file
-run: unzip Baileys-6.7.5.zip -d entahlah
+  run: unzip Baileys-6.7.5.zip -d entahlah
 - name: Configure Git
-run: |
+  run: |
 git config --local danurput@gmail.com "github-actions[bot]"
 git config --local MrSnZ "github-actions[bot]"
 - name: Add dan Commit perubahan
-run: |
+  run: |
 git add .
 git commit -m "Hasil unzip file"
 - name: Push perubahan
-uses: ad-m/github-push-action@v0.6.0
+  uses: ad-m/github-push-action@v0.6.0
 with:
-github_token: ${{ secrets.GITHUB_TOKEN }}
+  github_token: ${{ secrets.GITHUB_TOKEN }}
