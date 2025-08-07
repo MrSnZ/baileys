@@ -4,18 +4,18 @@ jobs:
   unzip-dan-push:
    runs-on: ubuntu-latest
     steps:
-- name: Checkout code
-  uses: actions/checkout@v4
-- name: Unzip file
-  run: unzip Baileys-6.7.5.zip -d entahlah
-- name: Configure Git
-  run: |
-    git config --local user.email "danurput@gmail.com"
-    git config --local user.name "MrSnZ"
-- name: Add dan Commit perubahan
-  run: |
-    git add .
-    git commit -m "Hasil unzip file"
+         - name: Checkout code
+           uses: actions/checkout@v4
+        - name: Unzip file
+           run: unzip Baileys-6.7.5.zip -d entahlah
+        - name: Configure Git
+          run: |
+           git config --local user.email "danurput@gmail.com"
+           git config --local user.name "MrSnZ"
+       - name: Add dan Commit perubahan
+          run: |
+           git add .
+           git commit -m "Hasil unzip file"
 - name: Push perubahan
   uses: ad-m/github-push-action@v0.6.0
 with:
