@@ -10,8 +10,8 @@ steps:
   run: unzip Baileys-6.7.5.zip -d entahlah
 - name: Configure Git
   run: |
-git config --local danurput@gmail.com "github-actions[bot]"
-git config --local MrSnZ "github-actions[bot]"
+git config --local user.email "danurput@gmail.com"
+git config --local user.name "MrSnZ"
 - name: Add dan Commit perubahan
   run: |
 git add .
